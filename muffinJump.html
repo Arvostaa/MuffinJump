@@ -11,10 +11,13 @@
 
     <script>
         var game = new Phaser.Game(640, 480, Phaser.CANVAS, 'game');
-
+        var xText;
+        var muffinPos;
         var PhaserGame = function () {
+
             this.muffin = null;
             this.steps = null;
+            this.background = null;
 
             this.facing = 'turn';
             this.edgeTimer = 0;
@@ -27,8 +30,11 @@
         PhaserGame.prototype = {
 
             init: function () {
-
+                this.world.height = 2000;
                 this.game.renderer.renderSession.roundPixels = true;
+                //  this.world.resize(640, 2000);
+
+
                 this.physics.startSystem(Phaser.Physics.ARCADE);
                 this.physics.arcade.gravity.y = 750;
                 this.physics.arcade.skipQuadTree = false;
@@ -38,11 +44,8 @@
             preload: function () {
 
                 this.load.spritesheet('muffin', 'assets/muffin.png', 32, 48);
-
-
                 this.load.image('trees', 'assets/trees.png');
                 this.load.image('clouds', 'assets/clouds.png');
-                this.load.image('background', 'assets/background.png');
                 this.load.image('step', 'assets/step.png');
                 this.load.image('ice', 'assets/ice.png');
             },
@@ -50,26 +53,45 @@
             create: function () {
 
                 this.stage.backgroundColor = '#2f9acc';
+                this.background = this.add.tileSprite(0, 0, 640, 480, 'clouds');
+                this.background.fixedToCamera = true;
 
-                this.add.sprite(0, 0, 'background');
+                this.add.sprite(0, 1906, 'trees');
 
                 this.steps = this.add.physicsGroup();
 
-                this.steps.create(150, 60, 'ice');
-                this.steps.create(300, 30, 'step');
-                this.steps.create(50, 350, 'step');
-                this.steps.create(50, 300, 'ice');
+                var x = 0;
+                var y = 100;
+
+                for (var i = 0; i < 19; i++) {
+                    var type = i % 2 === 1 ? 'step' : 'ice';
+                    var step = this.steps.create(x, y, type);
+
+                    var rand = Math.random() * (80 - 65) + 65;
+
+                    step.body.velocity.x = rand;
+
+                    if (Math.random() > 0.5) {
+                        step.body.velocity.x *= -1;
+                    }
+
+                    x += 200;
+
+                    if (x >= 600) {
+                        x = 0;
+                    }
+
+                    y += 100;
+                }
 
                 this.steps.setAll('body.allowGravity', false);
                 this.steps.setAll('body.immovable', true);
-                this.steps.setAll('body.velocity.x', 50);
 
-
-                this.muffin = this.add.sprite(30, 432, 'muffin');
+                this.muffin = this.add.sprite(320, 1980, 'muffin');
                 this.physics.arcade.enable(this.muffin);
+                this.camera.follow(this.muffin);
 
                 this.muffin.body.collideWorldBounds = true;
-
                 this.muffin.body.setSize(20, 32, 5, 16);
 
                 this.muffin.animations.add('left', [0, 1, 2, 3], 10, true);
@@ -77,17 +99,28 @@
                 this.muffin.animations.add('right', [5, 6, 7, 8], 10, true);
 
 
-                this.camera.follow(this.muffin);
                 this.cursors = this.input.keyboard.createCursorKeys();
 
+                xText = game.add.text(16, 16, 'posXreterter: 0', {
+                    fontSize: '100',
+                    fill: '#FFF'
+                });
+
+                muffinPos = game.add.text(16, 32, 'muffinPos: ', {
+                    fontSize: '100',
+                    fill: '#FFF'
+                });
             },
 
             wrapStep: function (step) {
 
-                if (step.body.velocity.x < 0 && step.x <= -160) {
+                if (step.x <= -150) {
                     step.x = 640;
-                } else if (step.body.velocity.x > 0 && step.x >= 640) {
-                    step.x = -160;
+                    step.body.velocity.x = (Math.random() * (80 - 65) + 65) * (-1);
+
+                } else if (step.x >= 640) {
+                    step.x = -150;
+                    step.body.velocity.x = Math.random() * (80 - 65) + 65;
                 }
 
             },
@@ -99,8 +132,18 @@
                 }
             },
 
-
             update: function () {
+
+                this.camera.follow(this.muffin);
+
+                this.background.tilePosition.y = -(this.camera.y * 0.7);
+
+                this.steps.forEach(function (value, index, arr) {
+                    if (value.y == 400)
+                        xText.text = "posX: " + value.x + ", posY: " + value.y;
+                });
+
+                muffinPos.text = "posX:" + this.muffin.body.x + ", posY: " + this.muffin.body.y;
 
                 this.steps.forEach(this.wrapStep, this);
 
@@ -138,10 +181,17 @@
                     }
                 }
 
-                if (standing && this.cursors.up.isDown && this.time.time > this.jumpTimer) {
+                if (!standing && this.wasStanding) {
+                    this.edgeTimer = this.time.time + 250;
+                }
+
+                if ((standing || this.time.time <= this.edgeTimer) && this.cursors.up.isDown && this.time.time > this.jumpTimer) {
                     this.muffin.body.velocity.y = -500;
                     this.jumpTimer = this.time.time + 750;
                 }
+
+                this.wasStanding = standing;
+
             }
         };
 
