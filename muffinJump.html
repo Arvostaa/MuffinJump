@@ -4,62 +4,55 @@
 <head>
     <title>MuffinJump</title>
     <meta charset="utf-8">
-    <script type="text/javascript" src="js/phaser.min.js"></script>
+    <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
 </head>
 
 <body>
 
+    <div id="game"></div>
+
     <script>
         var game = new Phaser.Game(640, 480, Phaser.CANVAS, 'game');
-        var xText;
+        // var xText;
         var muffinPos;
+        var scoreText;
+        var scoreCounter;
         var PhaserGame = function () {
-
             this.muffin = null;
+            this.cookies = null;
             this.steps = null;
             this.background = null;
-
             this.facing = 'turn';
             this.edgeTimer = 0;
             this.jumpTimer = 0;
-
             this.wasStanding = false;
             this.cursors = null;
         };
-
         PhaserGame.prototype = {
-
             init: function () {
-                this.world.height = 2000;
+                //this.world.height = 2000;
                 this.game.renderer.renderSession.roundPixels = true;
-                //  this.world.resize(640, 2000);
-
-
+                this.world.resize(640, 2000);
                 this.physics.startSystem(Phaser.Physics.ARCADE);
                 this.physics.arcade.gravity.y = 750;
                 this.physics.arcade.skipQuadTree = false;
-
             },
-
             preload: function () {
-
                 this.load.spritesheet('muffin', 'assets/muffin.png', 32, 48);
+                this.load.image('cookie', 'assets/cookie.png'); //////////////
                 this.load.image('trees', 'assets/trees.png');
                 this.load.image('clouds', 'assets/clouds.png');
                 this.load.image('step', 'assets/step.png');
                 this.load.image('ice', 'assets/ice.png');
             },
-
             create: function () {
-
                 this.stage.backgroundColor = '#2f9acc';
                 this.background = this.add.tileSprite(0, 0, 640, 480, 'clouds');
                 this.background.fixedToCamera = true;
-
                 this.add.sprite(0, 1906, 'trees');
 
                 this.steps = this.add.physicsGroup();
-
+                this.cookies = this.add.physicsGroup();
                 var x = 0;
                 var y = 100;
 
@@ -67,102 +60,100 @@
                     var type = i % 2 === 1 ? 'step' : 'ice';
                     var step = this.steps.create(x, y, type);
 
+                    var cookie1 = this.cookies.create(x + 10, y - 35, 'cookie');
+                    var cookie2 = this.cookies.create(x + 90, y - 35, 'cookie');
+
+
                     var rand = Math.random() * (80 - 65) + 65;
-
                     step.body.velocity.x = rand;
-
+                    cookie1.body.velocity.x = rand;
+                    cookie2.body.velocity.x = rand;
                     if (Math.random() > 0.5) {
                         step.body.velocity.x *= -1;
+                        cookie1.body.velocity.x *= -1;
+                        cookie2.body.velocity.x *= -1;
                     }
-
                     x += 200;
-
                     if (x >= 600) {
                         x = 0;
                     }
-
                     y += 100;
                 }
-
                 this.steps.setAll('body.allowGravity', false);
                 this.steps.setAll('body.immovable', true);
-
+                this.cookies.setAll('body.allowGravity', false);
+                this.cookies.setAll('body.immovable', true);
                 this.muffin = this.add.sprite(320, 1980, 'muffin');
                 this.physics.arcade.enable(this.muffin);
                 this.camera.follow(this.muffin);
-
                 this.muffin.body.collideWorldBounds = true;
                 this.muffin.body.setSize(20, 32, 5, 16);
-
                 this.muffin.animations.add('left', [0, 1, 2, 3], 10, true);
                 this.muffin.animations.add('turn', [4], 20, true);
                 this.muffin.animations.add('right', [5, 6, 7, 8], 10, true);
-
-
                 this.cursors = this.input.keyboard.createCursorKeys();
-
-                xText = game.add.text(16, 16, 'posXreterter: 0', {
-                    fontSize: '100',
+                /* xText = game.add.text(16, 1600, 'posX: 0', {
+                     fontSize: '70',
+                     fill: '#FFF'
+                 });*/
+                muffinPos = game.add.text(16, 1550, 'muffinPos: ', {
+                    fontSize: '70',
                     fill: '#FFF'
                 });
 
-                muffinPos = game.add.text(16, 32, 'muffinPos: ', {
-                    fontSize: '100',
-                    fill: '#FFF'
+                scoreText = game.add.text(16, 1600, 'Score: 0', {
+                    fontSize: '32px',
+                    fill: '#000'
                 });
             },
-
             wrapStep: function (step) {
-
                 if (step.x <= -150) {
                     step.x = 640;
                     step.body.velocity.x = (Math.random() * (80 - 65) + 65) * (-1);
-
                 } else if (step.x >= 640) {
                     step.x = -150;
                     step.body.velocity.x = Math.random() * (80 - 65) + 65;
                 }
-
             },
-
             setFriction: function (muffin, step) {
-
                 if (step.key === 'ice') {
                     muffin.body.x -= step.body.x - step.body.prev.x;
                 }
             },
 
+            countPoints: function (muff) {
+                var stand = muff.body.blocked.down || muff.body.touching.down;
+                scoreText = "Score: " + scoreCounter;
+                if (stand) {
+                    scoreCounter++;
+
+                }
+                scoreText = "Score: " + scoreCounter;
+            },
             update: function () {
 
                 this.camera.follow(this.muffin);
 
                 this.background.tilePosition.y = -(this.camera.y * 0.7);
-
-                this.steps.forEach(function (value, index, arr) {
+                /*  this.steps.forEach(function (value, index, arr) {
                     if (value.y == 400)
                         xText.text = "posX: " + value.x + ", posY: " + value.y;
-                });
+                });*/
 
-                muffinPos.text = "posX:" + this.muffin.body.x + ", posY: " + this.muffin.body.y;
-
+                muffinPos.text = "MUFFINposX:" + this.muffin.body.x + ", posY: " + this.muffin.body.y;
+                muffinPos.y = this.muffin.body.y - 200;
                 this.steps.forEach(this.wrapStep, this);
-
                 this.physics.arcade.collide(this.muffin, this.steps, this.setFriction, null, this);
-
                 var standing = this.muffin.body.blocked.down || this.muffin.body.touching.down;
-
                 this.muffin.body.velocity.x = 0;
-
                 if (this.cursors.left.isDown) {
                     this.muffin.body.velocity.x = -200;
-
                     if (this.facing !== 'left') {
                         this.muffin.play('left');
                         this.facing = 'left';
                     }
                 } else if (this.cursors.right.isDown) {
                     this.muffin.body.velocity.x = 200;
-
                     if (this.facing !== 'right') {
                         this.muffin.play('right');
                         this.facing = 'right';
@@ -170,31 +161,34 @@
                 } else {
                     if (this.facing !== 'idle') {
                         this.muffin.animations.stop();
-
                         if (this.facing === 'left') {
                             this.muffin.frame = 0;
                         } else {
                             this.muffin.frame = 5;
                         }
-
                         this.facing = 'idle';
                     }
                 }
-
                 if (!standing && this.wasStanding) {
                     this.edgeTimer = this.time.time + 250;
                 }
-
                 if ((standing || this.time.time <= this.edgeTimer) && this.cursors.up.isDown && this.time.time > this.jumpTimer) {
                     this.muffin.body.velocity.y = -500;
                     this.jumpTimer = this.time.time + 750;
                 }
-
                 this.wasStanding = standing;
+
+                /*
+                if (this.muffin.posY > 1500 && this.muffin.posY < 2000) {
+                    // scoreCounter = this.muffin.posY;
+                    scoreCounter += 10;
+                    scoreText.text = "Score: " + scoreCounter;
+                }
+                //   scoreText.text = "Score: " + this.muffin.posY;
+*/
 
             }
         };
-
         game.state.add('Game', PhaserGame, true);
     </script>
 
