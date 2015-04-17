@@ -13,10 +13,10 @@
 
     <script>
         var game = new Phaser.Game(640, 480, Phaser.CANVAS, 'game');
-        // var xText;
+        //      var camText;
         var muffinPos;
         var scoreText;
-        var scoreCounter;
+        var scoreCounter = 0;
         var PhaserGame = function () {
             this.muffin = null;
             this.cookies = null;
@@ -30,7 +30,7 @@
         };
         PhaserGame.prototype = {
             init: function () {
-                //this.world.height = 2000;
+
                 this.game.renderer.renderSession.roundPixels = true;
                 this.world.resize(640, 2000);
                 this.physics.startSystem(Phaser.Physics.ARCADE);
@@ -63,7 +63,6 @@
                     var cookie1 = this.cookies.create(x + 10, y - 35, 'cookie');
                     var cookie2 = this.cookies.create(x + 90, y - 35, 'cookie');
 
-
                     var rand = Math.random() * (80 - 65) + 65;
                     step.body.velocity.x = rand;
                     cookie1.body.velocity.x = rand;
@@ -81,8 +80,10 @@
                 }
                 this.steps.setAll('body.allowGravity', false);
                 this.steps.setAll('body.immovable', true);
+
                 this.cookies.setAll('body.allowGravity', false);
                 this.cookies.setAll('body.immovable', true);
+
                 this.muffin = this.add.sprite(320, 1980, 'muffin');
                 this.physics.arcade.enable(this.muffin);
                 this.camera.follow(this.muffin);
@@ -91,28 +92,35 @@
                 this.muffin.animations.add('left', [0, 1, 2, 3], 10, true);
                 this.muffin.animations.add('turn', [4], 20, true);
                 this.muffin.animations.add('right', [5, 6, 7, 8], 10, true);
+
                 this.cursors = this.input.keyboard.createCursorKeys();
-                /* xText = game.add.text(16, 1600, 'posX: 0', {
-                     fontSize: '70',
-                     fill: '#FFF'
-                 });*/
-                muffinPos = game.add.text(16, 1550, 'muffinPos: ', {
-                    fontSize: '70',
+                /*
+                                camText = this.add.text(16, 1600, 'posX: 0', {
+                                    fontSize: '10 px',
+                                    fill: '#FFF'
+
+                                });*/
+
+                muffinPos = this.add.text(16, 1550, 'muffinPos: ', {
+                    fontSize: '15 px',
                     fill: '#FFF'
                 });
 
-                scoreText = game.add.text(16, 1600, 'Score: 0', {
-                    fontSize: '32px',
+                scoreText = this.add.text(16, 1500, 'Score: 0', {
+                    fontSize: '25 px',
                     fill: '#000'
                 });
             },
-            wrapStep: function (step) {
-                if (step.x <= -150) {
-                    step.x = 640;
-                    step.body.velocity.x = (Math.random() * (80 - 65) + 65) * (-1);
-                } else if (step.x >= 640) {
-                    step.x = -150;
-                    step.body.velocity.x = Math.random() * (80 - 65) + 65;
+
+            wrapObjects: function (object) {
+
+                if (object.x <= -150) {
+                    object.x = 640;
+                    // object.body.velocity.x = velocity;
+
+                } else if (object.x >= 640) {
+                    object.x = -150;
+                    //object.body.velocity.x = velocity;
                 }
             },
             setFriction: function (muffin, step) {
@@ -121,28 +129,36 @@
                 }
             },
 
-            countPoints: function (muff) {
-                var stand = muff.body.blocked.down || muff.body.touching.down;
-                scoreText = "Score: " + scoreCounter;
-                if (stand) {
-                    scoreCounter++;
-
-                }
-                scoreText = "Score: " + scoreCounter;
+            collectCookies: function (muffin, cookie) {
+                cookie.kill();
+                scoreCounter += 10;
+                scoreText.text = 'Score: ' + scoreCounter;
             },
             update: function () {
+                var camPos = this.camera.y;
+                this.physics.arcade.collide(this.muffin, this.steps);
+                this.physics.arcade.collide(this.cookies, this.steps);
+                this.physics.arcade.overlap(this.muffin, this.cookies, this.collectCookies, null, this);
 
+                var randomVelocity = Math.random() * (80 - 65) + 65;
                 this.camera.follow(this.muffin);
 
-                this.background.tilePosition.y = -(this.camera.y * 0.7);
+                this.background.tilePosition.y = -(this.camera.y * 0, 1);
                 /*  this.steps.forEach(function (value, index, arr) {
                     if (value.y == 400)
                         xText.text = "posX: " + value.x + ", posY: " + value.y;
                 });*/
-
+                //   camText.text = "Cam: " + camPos;
                 muffinPos.text = "MUFFINposX:" + this.muffin.body.x + ", posY: " + this.muffin.body.y;
-                muffinPos.y = this.muffin.body.y - 200;
-                this.steps.forEach(this.wrapStep, this);
+                muffinPos.y = camPos + 20;
+                //scoreText.y += (this.muffin.body.y - 200 - (this.camera.y * 0, 1));
+
+                scoreText.y = camPos + 30;
+
+                this.steps.forEach(this.wrapObjects, this);
+                this.cookies.forEach(this.wrapObjects, this);
+
+
                 this.physics.arcade.collide(this.muffin, this.steps, this.setFriction, null, this);
                 var standing = this.muffin.body.blocked.down || this.muffin.body.touching.down;
                 this.muffin.body.velocity.x = 0;
