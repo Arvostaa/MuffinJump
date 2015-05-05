@@ -13,7 +13,7 @@
 
     <script>
         var game = new Phaser.Game(640, 480, Phaser.CANVAS, 'game');
-        //      var camText;
+
         var muffinPos;
         var scoreText;
         var scoreCounter = 0;
@@ -38,7 +38,7 @@
                 this.physics.arcade.skipQuadTree = false;
             },
             preload: function () {
-                this.load.spritesheet('muffin', 'assets/muffin.png', 32, 48);
+                this.load.spritesheet('muffin', 'assets/muffin2.png', 70, 58);
                 this.load.image('cookie', 'assets/cookie.png'); //////////////
                 this.load.image('trees', 'assets/trees.png');
                 this.load.image('clouds', 'assets/clouds.png');
@@ -88,18 +88,12 @@
                 this.physics.arcade.enable(this.muffin);
                 this.camera.follow(this.muffin);
                 this.muffin.body.collideWorldBounds = true;
-                this.muffin.body.setSize(20, 32, 5, 16);
+                this.muffin.body.setSize(70, 58, 0, 0);
                 this.muffin.animations.add('left', [0, 1, 2, 3], 10, true);
                 this.muffin.animations.add('turn', [4], 20, true);
                 this.muffin.animations.add('right', [5, 6, 7, 8], 10, true);
 
                 this.cursors = this.input.keyboard.createCursorKeys();
-                /*
-                                camText = this.add.text(16, 1600, 'posX: 0', {
-                                    fontSize: '10 px',
-                                    fill: '#FFF'
-
-                                });*/
 
                 muffinPos = this.add.text(16, 1550, 'muffinPos: ', {
                     fontSize: '15 px',
@@ -116,11 +110,10 @@
 
                 if (object.x <= -150) {
                     object.x = 640;
-                    // object.body.velocity.x = velocity;
 
                 } else if (object.x >= 640) {
                     object.x = -150;
-                    //object.body.velocity.x = velocity;
+
                 }
             },
             setFriction: function (muffin, step) {
@@ -136,7 +129,7 @@
             },
             update: function () {
                 var camPos = this.camera.y;
-                this.physics.arcade.collide(this.muffin, this.steps);
+
                 this.physics.arcade.collide(this.cookies, this.steps);
                 this.physics.arcade.overlap(this.muffin, this.cookies, this.collectCookies, null, this);
 
@@ -144,14 +137,9 @@
                 this.camera.follow(this.muffin);
 
                 this.background.tilePosition.y = -(this.camera.y * 0, 1);
-                /*  this.steps.forEach(function (value, index, arr) {
-                    if (value.y == 400)
-                        xText.text = "posX: " + value.x + ", posY: " + value.y;
-                });*/
-                //   camText.text = "Cam: " + camPos;
+
                 muffinPos.text = "MUFFINposX:" + this.muffin.body.x + ", posY: " + this.muffin.body.y;
                 muffinPos.y = camPos + 20;
-                //scoreText.y += (this.muffin.body.y - 200 - (this.camera.y * 0, 1));
 
                 scoreText.y = camPos + 30;
 
@@ -193,15 +181,6 @@
                     this.jumpTimer = this.time.time + 750;
                 }
                 this.wasStanding = standing;
-
-                /*
-                if (this.muffin.posY > 1500 && this.muffin.posY < 2000) {
-                    // scoreCounter = this.muffin.posY;
-                    scoreCounter += 10;
-                    scoreText.text = "Score: " + scoreCounter;
-                }
-                //   scoreText.text = "Score: " + this.muffin.posY;
-*/
 
             }
         };
