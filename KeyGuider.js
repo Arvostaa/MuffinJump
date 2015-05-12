@@ -2,11 +2,26 @@ KeyGuider = {};
 
 KeyGuider = function (game) {
     game.cursors = game.input.keyboard.createCursorKeys();
+    // pauseKey = game.input.keyboard.addKey(Phaser.Keyboard.P);
+    // pauseKey.onDown.add(this.pauseGame(game));
 };
+
+//KeyGuider.prototype.pauseGame = function (game) {
+//console.log("nosiema");
+//  game.paused = true;
+
+//};
+
 
 KeyGuider.prototype.updateKeys = function (game) {
     var standing = game.muffin.body.blocked.down || game.muffin.body.touching.down;
     game.muffin.body.velocity.x = 0;
+    // if (pauseKey.onDown) {
+    //     this.pauseGame(game);
+    // }
+
+
+
     if (game.cursors.left.isDown) {
         game.muffin.body.velocity.x = -200;
         if (game.facing !== 'left') {

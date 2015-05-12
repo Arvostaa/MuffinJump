@@ -16,7 +16,9 @@ ObjectsFactory.prototype.createSteps = function (game) {
     var x = 0;
     var y = 100;
 
-    for (var i = 0; i < 19; i++) {
+    game.add.button(100, 200, 'btnPlay', this.test, this, 0, 0);
+
+    for (var i = 0; i < 99; i++) {
         var type = i % 2 === 1 ? 'step' : 'ice';
         var step = game.steps.create(x, y, type);
 
@@ -32,7 +34,7 @@ ObjectsFactory.prototype.createSteps = function (game) {
             cookie1.body.velocity.x *= -1;
             cookie2.body.velocity.x *= -1;
         }
-        x += 200;
+        x += 100;
         if (x >= 600) {
             x = 0;
         }
@@ -41,14 +43,23 @@ ObjectsFactory.prototype.createSteps = function (game) {
 };
 
 ObjectsFactory.prototype.createMuffin = function (game) {
-    game.muffin = game.add.sprite(20, 1980, 'muffin');
+    game.muffin = game.add.sprite(20, 9980, 'muffin');
     game.physics.arcade.enable(game.muffin);
-    // game.camera.follow(game.muffin);
+    //game.camera.follow(game.muffin);
+
     game.muffin.body.collideWorldBounds = true;
     game.muffin.body.setSize(70, 58, 0, 0);
     game.muffin.animations.add('left', [0, 1, 2, 3], 10, true);
     game.muffin.animations.add('turn', [4], 20, true);
     game.muffin.animations.add('right', [5, 6, 7, 8], 10, true);
+
+    game.add.sprite(0, 0, 'muffin');
+
+
+};
+
+ObjectsFactory.prototype.test = function () {
+    console.log("xxx");
 
 };
 
@@ -64,6 +75,7 @@ ObjectsFactory.prototype.setGravity = function (game) {
 
 ObjectsFactory.prototype.updateObjects = function (game) {
     cameraGuider = new CameraGuider(game, game.muffin);
+    //  game.muffin.body.velocity.x = 250;
     game.physics.arcade.collide(game.cookies, game.steps);
     game.physics.arcade.overlap(game.muffin, game.cookies, this.collectCookies, null, game);
 
