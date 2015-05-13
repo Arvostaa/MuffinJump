@@ -9,6 +9,7 @@
     <script src="TextVariables.js"></script>
     <script src="CameraGuider.js"></script>
     <script src="KeyGuider.js"></script>
+    <script src="PausePanel.js"></script>
 
 </head>
 
@@ -38,6 +39,7 @@
         var textVariables;
         var keyGuider;
         var stateManager;
+        var pausePanel;
 
         PhaserGame.prototype = {
             init: function () {
@@ -55,6 +57,10 @@
                 this.load.image('clouds', 'assets/clouds.png');
                 this.load.image('step', 'assets/step.png');
                 this.load.image('ice', 'assets/ice.png');
+                this.load.image('btnPlay', 'assets/btnPlay.png');
+                this.load.image('btnPause', 'assets/btnPause.png');
+                this.load.image('panel', 'assets/panel.png');
+
             },
             create: function () {
                 this.stage.backgroundColor = '#2f9acc';
@@ -67,6 +73,7 @@
                 objectsFactory = new ObjectsFactory(this);
                 textVariables = new TextVariables(this);
                 keyGuider = new KeyGuider(this);
+                PausePanel = new PausePanel(this);
 
             },
 

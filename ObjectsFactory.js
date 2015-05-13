@@ -1,4 +1,4 @@
-ObjectsFactory = {};
+//ObjectsFactory = {};
 var CameraGuider;
 
 ObjectsFactory = function (game) {
