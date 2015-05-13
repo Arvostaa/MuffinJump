@@ -4,11 +4,12 @@
 <head>
     <title>MuffinJump</title>
     <meta charset="utf-8">
-    <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
+    <script src="phaser.min.js"></script>
     <script src="ObjectsFactory.js"></script>
     <script src="TextVariables.js"></script>
     <script src="CameraGuider.js"></script>
     <script src="KeyGuider.js"></script>
+
 </head>
 
 <body>
@@ -36,12 +37,13 @@
         var objectsFactory;
         var textVariables;
         var keyGuider;
+        var stateManager;
 
         PhaserGame.prototype = {
             init: function () {
 
                 this.game.renderer.renderSession.roundPixels = true;
-                this.world.resize(640, 2000);
+                this.world.resize(640, 10000);
                 this.physics.startSystem(Phaser.Physics.ARCADE);
                 this.physics.arcade.gravity.y = 750;
                 this.physics.arcade.skipQuadTree = false;
@@ -58,11 +60,14 @@
                 this.stage.backgroundColor = '#2f9acc';
                 this.background = this.add.tileSprite(0, 0, 640, 480, 'clouds');
                 this.background.fixedToCamera = true;
-                this.add.sprite(0, 1906, 'trees');
+                this.add.sprite(0, 9920, 'trees');
+                this.camera.y = 9802;
+
 
                 objectsFactory = new ObjectsFactory(this);
                 textVariables = new TextVariables(this);
                 keyGuider = new KeyGuider(this);
+
             },
 
             update: function () {
