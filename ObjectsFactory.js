@@ -25,12 +25,18 @@ ObjectsFactory.prototype.createSteps = function (game) {
 
         var rand = Math.random() * (80 - 65) + 65;
         step.body.velocity.x = rand;
+        step.velocSavedX = rand;
         cookie1.body.velocity.x = rand;
+        cookie1.velocSavedX = rand;
         cookie2.body.velocity.x = rand;
+        cookie2.velocSavedX = rand;
         if (Math.random() > 0.5) {
             step.body.velocity.x *= -1;
+            step.velocSavedX *= -1;
             cookie1.body.velocity.x *= -1;
+            cookie1.velocSavedX *= -1;
             cookie2.body.velocity.x *= -1;
+            cookie2.velocSavedX *= -1;
         }
         x += 100;
         if (x >= 600) {
@@ -51,8 +57,14 @@ ObjectsFactory.prototype.createMuffin = function (game) {
     game.muffin.animations.add('turn', [4], 20, true);
     game.muffin.animations.add('right', [5, 6, 7, 8], 10, true);
 
+    game.add.sprite(0, 0, 'muffin');
+
 };
 
+ObjectsFactory.prototype.test = function () {
+    console.log("xxx");
+
+};
 
 ObjectsFactory.prototype.setGravity = function (game) {
     game.steps.setAll('body.allowGravity', false);

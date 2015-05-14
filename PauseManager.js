@@ -1,72 +1,32 @@
-//PauseManager = {};
-var pause = true;
-var panelTextStyle = {
-        font: "30px Helvetica",
-        fill: "#000"
-    }
-    // Create our pause panel extending Phaser.Group
 PauseManager = function (game) {
-    // Super call to Phaser.Group
-    // Phaser.Group.call(this, game, parent);
-
-    // Add the panel
-    game.panel = game.add.sprite(0, 9550, 'panel');
-    //game.panel.visible = false;
-
-    pauseText = game.add.text(80, 9300, 'Game paused', panelTextStyle);
-    btnPlay = game.add.button(10, 9550, 'btnPlay', (function () {
-        game.add.tween(game.panel).to({
-            y: 9300
-        }, 900, Phaser.Easing.Linear.NONE, true);
-        game.add.tween(btnPlay).to({
-            y: 9300
-        }, 900, Phaser.Easing.Linear.NONE, true);
-
-    }), game);
-};
-
-
-
-/*
-btnPause = game.add.button(10, 9531, 'btnPause', (function () {
-    game.add.tween(game.panel).to({
-        y: 9525
-    }, 900, Phaser.Easing.Bounce.Out, true);
-    game.add.tween(pauseText).to({
-        y: 9540
-    }, 900, Phaser.Easing.Bounce.Out, true);
-
-
-}), game);*/
-/*
-
-    btnPause = game.add.button(10, 9531, 'btnPause', this.pauseGame, game);
-
-
+    this.game = game;
+    this.pausePanel = new PausePanel(game);
+    this.steps = game.steps;
 
 };
 
-PauseManager.prototype.pauseGame = function (game) {
-        if (!paused) {
-            // Show panel
-            paused = true;
-            this.pausePanel.show();
+PauseManager.prototype.managePause = function () {
+    if (this.pausePanel.paused) {
+        this.game.muffin.body.enable = false;
+
+        for (var k = 0; k < this.game.cookies.length; k++) {
+            this.game.cookies.getAt(k).body.velocity.x = 0;
         }
 
-        PauseManager.prototype.cl = function () {
-
-            console.log("overoverover");
+        for (var k = 0; k < this.game.steps.length; k++) {
+            this.game.steps.getAt(k).body.velocity.x = 0;
         }
 
+    } else if (!this.pausePanel.paused) {
+        this.game.muffin.body.enable = true;
 
-        PauseManager.prototype.show = function (object) {
-            game.add.tween(object).to({
-                y: 9525
-            }, 900, Phaser.Easing.Bounce.Out, true);
-        };
-        PauseManager.prototype.hide = function (object) {
-            game.add.tween(object).to({
-                y: 9300
-            }, 900, Phaser.Easing.Linear.NONE, true);
+        for (var k = 0; k < this.game.cookies.length; k++) {
+            this.game.cookies.getAt(k).body.velocity.x = this.game.cookies.getAt(k).velocSavedX;
+        }
 
-        };*/
+        for (var k = 0; k < this.game.steps.length; k++) {
+            this.steps.getAt(k).body.velocity.x = this.steps.getAt(k).velocSavedX;
+        }
+
+    }
+};

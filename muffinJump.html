@@ -10,7 +10,8 @@
     <script src="CameraGuider.js"></script>
     <script src="KeyGuider.js"></script>
     <script src="PausePanel.js"></script>
-
+    <script src="PauseManager.js"></script>
+    <script src="MuffinStateManager.js"></script>
 </head>
 
 <body>
@@ -18,6 +19,7 @@
     <div id="game"></div>
 
     <script>
+        var paused = true;
         var game = new Phaser.Game(640, 480, Phaser.CANVAS, 'game');
 
         var muffinPos;
@@ -40,6 +42,7 @@
         var keyGuider;
         var stateManager;
         var pausePanel;
+
 
         PhaserGame.prototype = {
             init: function () {
@@ -67,23 +70,25 @@
                 this.background = this.add.tileSprite(0, 0, 640, 480, 'clouds');
                 this.background.fixedToCamera = true;
                 this.add.sprite(0, 9920, 'trees');
-                this.camera.y = 9802;
-
+                this.camera.y = 9520;
 
                 objectsFactory = new ObjectsFactory(this);
                 textVariables = new TextVariables(this);
                 keyGuider = new KeyGuider(this);
-                PausePanel = new PausePanel(this);
-
+                PauseManager = new PauseManager(this);
             },
 
             update: function () {
                 objectsFactory.updateObjects(this);
                 textVariables.updateText(this);
                 keyGuider.updateKeys(this);
-            }
+                PauseManager.managePause(this);
+            },
         };
+
+
         game.state.add('Game', PhaserGame, true);
+        game.state.start('Game');
     </script>
 
 </body>

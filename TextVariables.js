@@ -6,8 +6,7 @@ var scoreTextStyle = {
 }
 
 TextVariables = function (game) {
-
-    scoreText = game.add.text(20, 1500, 'Score: 0', scoreTextStyle);
+    scoreText = game.add.text(100, 1500, 'Score: 0', scoreTextStyle);
 };
 
 TextVariables.prototype.updateText = function (game) {

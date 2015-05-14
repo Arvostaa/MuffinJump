@@ -1,4 +1,3 @@
-var paused = true;
 var panelTextStyle = {
     font: "30px Helvetica",
     fill: "#000"
@@ -6,6 +5,7 @@ var panelTextStyle = {
 
 PausePanel = function (game) {
     this.game = game;
+    this.paused = false;
     game.panel = game.add.sprite(0, 9300, 'panel');
     pauseText = game.add.text(80, 9300, 'Game paused', panelTextStyle);
 
@@ -15,6 +15,8 @@ PausePanel = function (game) {
 };
 
 PausePanel.prototype.pauseGame = function () {
+
+    this.paused = true;
 
     this.game.add.tween(this.game.panel).to({
         y: 9525
@@ -30,8 +32,8 @@ PausePanel.prototype.pauseGame = function () {
 
 PausePanel.prototype.resumeGame = function () {
 
-    if (paused)
-        paused = false;
+
+    this.paused = false;
 
     this.game.add.tween(this.game.panel).to({
         y: 9300
